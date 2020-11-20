@@ -52,9 +52,8 @@ connection = pika.BlockingConnection(pika.ConnectionParameters(
                                         credentials))
 channel = connection.channel()
 
+#declarar la colas o queue
 channel.queue_declare(queue=database_configuration['queue'],durable=True)
-print('pere que cargue ome, para salir apachurrele CTRL+C')
-print('qhubo ya espero?')
 
 
 def callback(ch, method, properties, body):
@@ -65,11 +64,6 @@ def callback(ch, method, properties, body):
     document_type=task['document_type']
     now = datetime.now()
     ########concepts
-    # if document_type=='concepts':
-    #     path_file="./received_files/concept/concept_{0}_{1}.tsv".format(file_id,now.strftime(%Y%m%d%H%M%S"))
-    #     utils.download_file_from_google_drive(file_id,path_file)
-    #     print("ejecutando concepts_etl.py: {}",format(path_file))
-    ########vocabulary
     if document_type=='concepts':
         #path_file = "./received_files/concepts/AllConcepts_{0}_{1}.tsv".format(file_id,now.strftime("%Y%m%d%H%M%S"))
         path_file = "./received_files/concept/concept_{0}_{1}.tsv".format(file_id,now.strftime("%Y%m%d%H%M%S"))
@@ -99,21 +93,6 @@ def callback(ch, method, properties, body):
     else:
         print("the type of document entered is invalid")
 
-#####################parte original del cod
-    # path_file = "./received_files/vocabulary/vocabulary_{0}_{1}.csv".format(file_id,
-    #                                                                         now.strftime("%Y%m%d%H%M%S"))
-    # utils.download_file_from_google_drive(file_id, 
-    #                                       path_file)
-    # print("executing vocabulary etl with file: {}".format(path_file))
-    # resultado = vocabulary_etl.execute(path_file)
-    # print("-----------------------------------resultado: {}".format(resultado))
-    # ####final_cambios
-    # if resultado:
-    #     # update task in success
-    #     update_status_task(task['uuid'], True)
-    # else:
-    #     # update task in error
-    #     update_status_task(str(task['uuid']), False)
 
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(queue=database_configuration['queue'],    
@@ -121,3 +100,4 @@ channel.basic_consume(queue=database_configuration['queue'],
                       
 print(' [*] Waiting for messages. To exit press CTRL+C')
 channel.start_consuming()
+#channel.start_consuming2()
